@@ -1,8 +1,13 @@
 import React, { Component } from "react";
-import "./App.css";
-import Person from "./Persons/Persons";
+import classes from "./App.css";
+import Cockpit from "../components/Cockpit/Cockpit";
+import Persons from "../components/Persons/Persons";
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    console.log("[App.js constructor]");
+  }
   state = {
     persons: [
       { id: "asfa1", name: "Max", age: 28 },
@@ -10,8 +15,31 @@ class App extends Component {
       { id: "asdf11", name: "Stephanie", age: 26 }
     ],
     otherState: "some other value",
-    showPersons: false
+    showPersons: false,
+    showCockpit: true
   };
+
+  static getDerivedStateFromProps(props, state) {
+    console.log("[App.js] getDerivedStateFromProps");
+    return state;
+  }
+
+  // componentWillMount() {
+  //   console.log("[App.js] componentWillMount())");
+  // }
+
+  componentDidMount() {
+    console.log("[App.js] componentDidMount()");
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log("[App.js] shouldComponentUpdate()");
+    return true;
+  }
+
+  componentDidUpdate() {
+    console.log("[App.js] componentDidUpdate()");
+  }
 
   nameChangedHandler = (event, id) => {
     const personIndex = this.state.persons.findIndex(p => {
@@ -45,6 +73,7 @@ class App extends Component {
   };
 
   render() {
+    console.log("[App.js] render");
     const style = {
       backgroundColor: "green",
       color: "white",
@@ -59,38 +88,28 @@ class App extends Component {
     if (this.state.showPersons) {
       persons = (
         <div>
-          {this.state.persons.map((person, index) => {
-            return (
-              <Person
-                click={() => this.deletePersonHandler(index)}
-                name={person.name}
-                age={person.age}
-                key={person.id}
-                changed={event => this.nameChangedHandler(event, person.id)}
-              />
-            );
-          })}
+          <Persons
+            persons={this.state.persons}
+            clicked={this.deletePersonHandler}
+            changed={this.nameChangedHandler}
+          />
         </div>
       );
-
       style.backgroundColor = "red";
     }
 
-    const classes = [];
-    if (this.state.persons.length <= 2) {
-      classes.push("red"); // classes = ['red']
-    }
-    if (this.state.persons.length <= 1) {
-      classes.push("bold"); // classes = ['red', 'bold']
-    }
-
     return (
-      <div className="App">
-        <h1>Hi, I'm a React App</h1>
-        <p className={classes.join(" ")}>This is really working!</p>
-        <button style={style} onClick={this.togglePersonsHandler}>
-          Toggle Persons
+      <div className={classes.App}>
+        <button onClick={() => this.setState({ showCockpit: false })}>
+          Remove Cockpit
         </button>
+        {this.state.showCockpit ? (
+          <Cockpit
+            showPersons={this.state.showPersons}
+            persons={this.state.persons}
+            clicked={this.togglePersonsHandler}
+          />
+        ) : null}
         {persons}
       </div>
     );
